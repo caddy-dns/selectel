@@ -19,10 +19,10 @@ To use this module for the ACME DNS challenge, [configure the ACME issuer in you
     "dns": {
       "provider": {
         "name": "selectel",
-        "user": "SELECTEL_USER", // see link "Selectel Service user" below
+        "user": "SELECTEL_USER",
         "password": "SELECTEL_PASSWORD",
-        "account_id": "SELECTEL_ACCOUNT_ID", // your main Selectel account id, like "123456"
-        "project_name": "SELECTEL_PROJECT_NAME" // a project in which the service user is an administrator
+        "account_id": "SELECTEL_ACCOUNT_ID",
+        "project_name": "SELECTEL_PROJECT_NAME"
       }
     }
   }
@@ -35,10 +35,10 @@ or with the Caddyfile:
 # globally
 {
 	acme_dns selectel {
-		user <SELECTEL_USER>
-		password <SELECTEL_PASSWORD>
-		account_id <SELECTEL_ACCOUNT_ID>
-		project_name <SELECTEL_PROJECT_NAME>
+		user {env.SELECTEL_USER}
+		password {env.SELECTEL_PASSWORD}
+		account_id {env.SELECTEL_ACCOUNT_ID}
+		project_name {env.SELECTEL_PROJECT_NAME}
 	}
 }
 ```
@@ -47,14 +47,18 @@ or with the Caddyfile:
 # one site
 tls {
 	dns selectel {
-		user <SELECTEL_USER>
-		password <SELECTEL_PASSWORD>
-		account_id <SELECTEL_ACCOUNT_ID>
-		project_name <SELECTEL_PROJECT_NAME>
+		user {env.SELECTEL_USER}
+		password {env.SELECTEL_PASSWORD}
+		account_id {env.SELECTEL_ACCOUNT_ID}
+		project_name {env.SELECTEL_PROJECT_NAME}
 	}
 }
 ```
 
-Selectel [Service user](https://my.selectel.ru/iam/users_management/users?type=service) management
+### Optional directives
 
-Always yours [@jjazzme](https://github.com/jjazzme)
+| Directive | Description |
+|---|---|
+| `enable_debug_logging` | Enables verbose DEBUG-level log output for all DNS operations. INFO and ERROR messages are always emitted when a logger is set. |
+
+Selectel [Service user](https://my.selectel.ru/iam/users_management/users?type=service) management

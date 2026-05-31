@@ -1,8 +1,6 @@
 package selectel
 
 import (
-	// "fmt"
-
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 	"github.com/libdns/selectel"
@@ -29,6 +27,11 @@ func (p *Provider) Provision(ctx caddy.Context) error {
 	p.Provider.Password = caddy.NewReplacer().ReplaceAll(p.Provider.Password, "")
 	p.Provider.AccountId = caddy.NewReplacer().ReplaceAll(p.Provider.AccountId, "")
 	p.Provider.ProjectName = caddy.NewReplacer().ReplaceAll(p.Provider.ProjectName, "")
+
+	if p.Provider.ZonesCache == nil {
+		p.Provider.ZonesCache = make(map[string]string)
+	}
+
 	return nil
 }
 
@@ -76,12 +79,13 @@ func (p *Provider) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 				if d.NextArg() {
 					return d.ArgErr()
 				}
+			case "enable_debug_logging":
+				p.Provider.EnableDebugLogging = true
 			default:
 				return d.Errf("unrecognized subdirective '%s'", d.Val())
 			}
 		}
 	}
-
 
 	if p.Provider.User == "" {
 		return d.Err("missing User")
