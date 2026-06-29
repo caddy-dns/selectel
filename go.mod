@@ -5,7 +5,12 @@ go 1.25
 require (
 	github.com/caddyserver/caddy/v2 v2.10.2
 	github.com/libdns/selectel v1.1.0
+	go.uber.org/zap v1.27.0
 )
+
+// Local development: point to the fork instead of the published module.
+// Remove this replace directive when publishing a tagged release of the fork.
+replace github.com/libdns/selectel => ../selectel-libdns-fork
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -28,7 +33,6 @@ require (
 	github.com/zeebo/blake3 v0.2.4 // indirect
 	go.uber.org/mock v0.5.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0 // indirect
 	go.uber.org/zap/exp v0.3.0 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/mod v0.28.0 // indirect

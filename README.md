@@ -1,6 +1,6 @@
 # Selectel DNS v2 module for Caddy
 
-This package contains a DNS provider module for [Caddy](https://github.com/caddyserver/caddy). It can be used to manage DNS records with [Selectel DNS v2 API](https://developers.selectel.ru/docs/cloud-services/dns_api/dns_api_actual/).
+This package contains a DNS provider module for [Caddy](https://github.com/caddyserver/caddy). It manages DNS records via the [Selectel DNS v2 API](https://docs.selectel.ru/en/api/dns-actual/).
 
 ## Caddy module name
 
@@ -10,7 +10,33 @@ dns.providers.selectel
 
 ## Config examples
 
-To use this module for the ACME DNS challenge, [configure the ACME issuer in your Caddy JSON](https://caddyserver.com/docs/json/apps/tls/automation/policies/issuer/acme/) like so:
+### Caddyfile
+
+```
+# Globally (all sites)
+{
+	acme_dns selectel {
+		user        {env.SELECTEL_USER}
+		password    {env.SELECTEL_PASSWORD}
+		account_id  {env.SELECTEL_ACCOUNT_ID}
+		project_name {env.SELECTEL_PROJECT_NAME}
+	}
+}
+```
+
+```
+# Per site
+tls {
+	dns selectel {
+		user        {env.SELECTEL_USER}
+		password    {env.SELECTEL_PASSWORD}
+		account_id  {env.SELECTEL_ACCOUNT_ID}
+		project_name {env.SELECTEL_PROJECT_NAME}
+	}
+}
+```
+
+### JSON
 
 ```json
 {
@@ -29,36 +55,44 @@ To use this module for the ACME DNS challenge, [configure the ACME issuer in you
 }
 ```
 
-or with the Caddyfile:
-
-```
-# globally
-{
-	acme_dns selectel {
-		user {env.SELECTEL_USER}
-		password {env.SELECTEL_PASSWORD}
-		account_id {env.SELECTEL_ACCOUNT_ID}
-		project_name {env.SELECTEL_PROJECT_NAME}
-	}
-}
-```
-
-```
-# one site
-tls {
-	dns selectel {
-		user {env.SELECTEL_USER}
-		password {env.SELECTEL_PASSWORD}
-		account_id {env.SELECTEL_ACCOUNT_ID}
-		project_name {env.SELECTEL_PROJECT_NAME}
-	}
-}
-```
-
-### Optional directives
+## Required directives
 
 | Directive | Description |
 |---|---|
-| `enable_debug_logging` | Enables verbose DEBUG-level log output for all DNS operations. INFO and ERROR messages are always emitted when a logger is set. |
+| `user` | Selectel service-user login. |
+| `password` | Selectel service-user password. |
+| `account_id` | Selectel account ID (domain name). |
+| `project_name` | Selectel project name that owns the DNS zones. |
 
-Selectel [Service user](https://my.selectel.ru/iam/users_management/users?type=service) management
+All values support the `{env.VAR}` placeholder syntax.
+
+## Optional directives
+
+| Directive | Description |
+|---|---|
+| `enable_debug_logging` | Enables verbose DEBUG-level log output for all DNS operations (bare flag = `true`). Accepts an optional value: `true`, `false`, `1`, `0`, or an env placeholder that resolves to one of these (e.g. `{env.SELECTEL_DEBUG}`). |
+
+### Debug logging
+
+When `enable_debug_logging` is set, all provider messages (INFO, ERROR, and DEBUG) flow through Caddy's configured logging system at the `debug` level. Caddy's own log level setting controls whether they are emitted. The severity of each message is preserved as a `[INFO]` / `[ERROR]` / `[DEBUG]` prefix inside the message text.
+
+```
+{
+    log {
+        level DEBUG
+    }
+    acme_dns selectel {
+        user        {env.SELECTEL_USER}
+        password    {env.SELECTEL_PASSWORD}
+        account_id  {env.SELECTEL_ACCOUNT_ID}
+        project_name {env.SELECTEL_PROJECT_NAME}
+        enable_debug_logging
+    }
+}
+```
+
+## Credentials
+
+This module requires a Selectel [service user](https://my.selectel.ru/iam/users_management/users?type=service) with access to the project that owns the DNS zones.
+
+The Selectel DNS v2 API uses a project-scoped IAM token (Keystone v3). The module obtains and automatically refreshes this token — you only need to supply the service-user credentials above.
